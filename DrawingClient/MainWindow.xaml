@@ -1,0 +1,40 @@
+﻿<Window x:Class="DrawingClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrawingClient"
+        mc:Ignorable="d"
+        Title="Collaborative Drawing" Height="450" Width="800"
+        Loaded="Window_Loaded" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Padding="10" Background="#F0F0F0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Server: " VerticalAlignment="Center"/>
+                <TextBox x:Name="ServerUrlInput" Text="ws://localhost:5000/ws" Width="200" Margin="5,0"/>
+                <Button Content="Connect" Click="Connect_Click" Padding="10,2" Margin="5,0"/>
+                <Separator Margin="10,0"/>
+                <TextBlock Text="Status: " FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock x:Name="StatusText" Text="Disconnected" Foreground="Red" VerticalAlignment="Center"/>
+                <Separator Margin="10,0"/>
+                <TextBlock Text="Color: " VerticalAlignment="Center"/>
+                <ComboBox x:Name="ColorPicker" SelectedIndex="0" Width="100">
+                    <ComboBoxItem Content="Black" Tag="#000000"/>
+                    <ComboBoxItem Content="Red" Tag="#FF0000"/>
+                    <ComboBoxItem Content="Blue" Tag="#0000FF"/>
+                    <ComboBoxItem Content="Green" Tag="#008000"/>
+                </ComboBox>
+            </StackPanel>
+        </Border>
+
+        <Canvas x:Name="DrawingCanvas" Grid.Row="1" Background="White"
+                MouseDown="DrawingCanvas_MouseDown"
+                MouseMove="DrawingCanvas_MouseMove"
+                MouseUp="DrawingCanvas_MouseUp"/>
+    </Grid>
+</Window>
