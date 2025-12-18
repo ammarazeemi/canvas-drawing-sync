@@ -14,8 +14,10 @@ namespace DrawingClient
     {
         private ClientWebSocket _webSocket;
         private bool _isDrawing;
+        private Point _startPoint;
         private Point _lastPoint;
         private CancellationTokenSource _cts;
+        private Shape _previewShape;
 
         public MainWindow()
         {
@@ -81,7 +83,7 @@ namespace DrawingClient
 
                         if (drawEvent != null)
                         {
-                            Dispatcher.Invoke(() => DrawLine(drawEvent));
+                            Dispatcher.Invoke(() => DrawShape(drawEvent));
                         }
                     }
                 }
@@ -99,63 +101,181 @@ namespace DrawingClient
 
         private void DrawingCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ButtonState == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
                 _isDrawing = true;
-                _lastPoint = e.GetPosition(DrawingCanvas);
+                _startPoint = e.GetPosition(DrawingCanvas);
+                _lastPoint = _startPoint;
+                DrawingCanvas.CaptureMouse();
             }
         }
 
         private void DrawingCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isDrawing)
+            if (_isDrawing && e.LeftButton == MouseButtonState.Pressed)
             {
                 var currentPoint = e.GetPosition(DrawingCanvas);
                 var colorTag = ((ComboBoxItem)ColorPicker.SelectedItem).Tag.ToString();
+                var shapeTag = ((ComboBoxItem)ShapePicker.SelectedItem).Tag.ToString();
+                var shapeType = Enum.Parse<ShapeType>(shapeTag);
 
+                if (shapeType == ShapeType.Line)
+                {
+                    var drawEvent = new DrawEvent
+                    {
+                        Type = EventType.Draw,
+                        Shape = ShapeType.Line,
+                        StartX = _lastPoint.X,
+                        StartY = _lastPoint.Y,
+                        EndX = currentPoint.X,
+                        EndY = currentPoint.Y,
+                        Color = colorTag,
+                        Width = 2
+                    };
+
+                    DrawShape(drawEvent);
+                    _ = SendDrawEventAsync(drawEvent);
+                    _lastPoint = currentPoint;
+                }
+                else
+                {
+                    // Update preview
+                    if (_previewShape != null)
+                    {
+                        DrawingCanvas.Children.Remove(_previewShape);
+                    }
+
+                    var drawEvent = new DrawEvent
+                    {
+                        Type = EventType.Draw,
+                        Shape = shapeType,
+                        StartX = _startPoint.X,
+                        StartY = _startPoint.Y,
+                        EndX = currentPoint.X,
+                        EndY = currentPoint.Y,
+                        Color = colorTag,
+                        Width = 2
+                    };
+
+                    _previewShape = CreateShape(drawEvent);
+                    _previewShape.Opacity = 0.5;
+                    DrawingCanvas.Children.Add(_previewShape);
+                }
+            }
+            else if (_isDrawing)
+            {
+                // Safety: if button is released but MouseUp didn't fire correctly
+                StopDrawing(e.GetPosition(DrawingCanvas));
+            }
+        }
+
+        private void DrawingCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isDrawing)
+            {
+                StopDrawing(e.GetPosition(DrawingCanvas));
+            }
+        }
+
+        private void StopDrawing(Point currentPoint)
+        {
+            var shapeTag = ((ComboBoxItem)ShapePicker.SelectedItem).Tag.ToString();
+            var shapeType = Enum.Parse<ShapeType>(shapeTag);
+
+            if (shapeType != ShapeType.Line)
+            {
+                if (_previewShape != null)
+                {
+                    DrawingCanvas.Children.Remove(_previewShape);
+                    _previewShape = null;
+                }
+
+                var colorTag = ((ComboBoxItem)ColorPicker.SelectedItem).Tag.ToString();
                 var drawEvent = new DrawEvent
                 {
-                    StartX = _lastPoint.X,
-                    StartY = _lastPoint.Y,
+                    Type = EventType.Draw,
+                    Shape = shapeType,
+                    StartX = _startPoint.X,
+                    StartY = _startPoint.Y,
                     EndX = currentPoint.X,
                     EndY = currentPoint.Y,
                     Color = colorTag,
                     Width = 2
                 };
 
-                // Draw locally immediately
-                DrawLine(drawEvent);
-
-                // Send to server
+                DrawShape(drawEvent);
                 _ = SendDrawEventAsync(drawEvent);
-
-                _lastPoint = currentPoint;
             }
-        }
 
-        private void DrawingCanvas_MouseUp(object sender, MouseButtonEventArgs e)
-        {
             _isDrawing = false;
+            DrawingCanvas.ReleaseMouseCapture();
         }
 
-        private void DrawLine(DrawEvent drawEvent)
+        private void DrawShape(DrawEvent drawEvent)
         {
-            var line = new Line
+            if (drawEvent.Type == EventType.Clear)
             {
-                X1 = drawEvent.StartX,
-                Y1 = drawEvent.StartY,
-                X2 = drawEvent.EndX,
-                Y2 = drawEvent.EndY,
-                Stroke = (SolidColorBrush)new BrushConverter().ConvertFromString(drawEvent.Color),
-                StrokeThickness = drawEvent.Width
-            };
+                DrawingCanvas.Children.Clear();
+                return;
+            }
 
-            DrawingCanvas.Children.Add(line);
+            var shape = CreateShape(drawEvent);
+            DrawingCanvas.Children.Add(shape);
+        }
+
+        private Shape CreateShape(DrawEvent drawEvent)
+        {
+            Shape shape;
+            switch (drawEvent.Shape)
+            {
+                case ShapeType.Rectangle:
+                    shape = new Rectangle
+                    {
+                        Width = Math.Abs(drawEvent.EndX - drawEvent.StartX),
+                        Height = Math.Abs(drawEvent.EndY - drawEvent.StartY),
+                        Stroke = (SolidColorBrush)new BrushConverter().ConvertFromString(drawEvent.Color),
+                        StrokeThickness = drawEvent.Width
+                    };
+                    Canvas.SetLeft(shape, Math.Min(drawEvent.StartX, drawEvent.EndX));
+                    Canvas.SetTop(shape, Math.Min(drawEvent.StartY, drawEvent.EndY));
+                    break;
+                case ShapeType.Ellipse:
+                    shape = new Ellipse
+                    {
+                        Width = Math.Abs(drawEvent.EndX - drawEvent.StartX),
+                        Height = Math.Abs(drawEvent.EndY - drawEvent.StartY),
+                        Stroke = (SolidColorBrush)new BrushConverter().ConvertFromString(drawEvent.Color),
+                        StrokeThickness = drawEvent.Width
+                    };
+                    Canvas.SetLeft(shape, Math.Min(drawEvent.StartX, drawEvent.EndX));
+                    Canvas.SetTop(shape, Math.Min(drawEvent.StartY, drawEvent.EndY));
+                    break;
+                case ShapeType.Line:
+                default:
+                    shape = new Line
+                    {
+                        X1 = drawEvent.StartX,
+                        Y1 = drawEvent.StartY,
+                        X2 = drawEvent.EndX,
+                        Y2 = drawEvent.EndY,
+                        Stroke = (SolidColorBrush)new BrushConverter().ConvertFromString(drawEvent.Color),
+                        StrokeThickness = drawEvent.Width
+                    };
+                    break;
+            }
+            return shape;
+        }
+
+        private async void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            var clearEvent = new DrawEvent { Type = EventType.Clear };
+            DrawShape(clearEvent);
+            await SendDrawEventAsync(clearEvent);
         }
 
         private async Task SendDrawEventAsync(DrawEvent drawEvent)
         {
-            if (_webSocket.State == WebSocketState.Open)
+            if (_webSocket != null && _webSocket.State == WebSocketState.Open)
             {
                 var json = JsonSerializer.Serialize(drawEvent);
                 var buffer = Encoding.UTF8.GetBytes(json);

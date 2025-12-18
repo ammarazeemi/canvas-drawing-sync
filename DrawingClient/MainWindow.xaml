@@ -23,12 +23,21 @@
                 <TextBlock x:Name="StatusText" Text="Disconnected" Foreground="Red" VerticalAlignment="Center"/>
                 <Separator Margin="10,0"/>
                 <TextBlock Text="Color: " VerticalAlignment="Center"/>
-                <ComboBox x:Name="ColorPicker" SelectedIndex="0" Width="100">
+                <ComboBox x:Name="ColorPicker" SelectedIndex="0" Width="80" Margin="5,0">
                     <ComboBoxItem Content="Black" Tag="#000000"/>
                     <ComboBoxItem Content="Red" Tag="#FF0000"/>
                     <ComboBoxItem Content="Blue" Tag="#0000FF"/>
                     <ComboBoxItem Content="Green" Tag="#008000"/>
                 </ComboBox>
+                <Separator Margin="10,0"/>
+                <TextBlock Text="Shape: " VerticalAlignment="Center"/>
+                <ComboBox x:Name="ShapePicker" SelectedIndex="0" Width="80" Margin="5,0">
+                    <ComboBoxItem Content="Line" Tag="Line"/>
+                    <ComboBoxItem Content="Rect" Tag="Rectangle"/>
+                    <ComboBoxItem Content="Circle" Tag="Ellipse"/>
+                </ComboBox>
+                <Separator Margin="10,0"/>
+                <Button Content="Clear" Click="Clear_Click" Padding="10,2" Background="#FFE0E0"/>
             </StackPanel>
         </Border>
 

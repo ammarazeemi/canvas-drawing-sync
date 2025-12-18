@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DrawingServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ed74b467abe39ad8d2fe26ec13b3a0e1f080bf3")]
 [assembly: System.Reflection.AssemblyProductAttribute("DrawingServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DrawingServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

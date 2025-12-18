@@ -33,3 +33,4 @@ C:\Users\PC\Documents\NP Project\DrawingServer\obj\Debug\net10.0\refint\DrawingS
 C:\Users\PC\Documents\NP Project\DrawingServer\obj\Debug\net10.0\DrawingServer.pdb
 C:\Users\PC\Documents\NP Project\DrawingServer\obj\Debug\net10.0\DrawingServer.genruntimeconfig.cache
 C:\Users\PC\Documents\NP Project\DrawingServer\obj\Debug\net10.0\ref\DrawingServer.dll
+C:\Users\PC\Documents\NP Project\DrawingServer\obj\Debug\net10.0\DrawingServer.sourcelink.json

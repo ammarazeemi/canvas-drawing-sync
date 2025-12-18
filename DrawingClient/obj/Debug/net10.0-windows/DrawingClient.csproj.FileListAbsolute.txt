@@ -22,3 +22,4 @@ C:\Users\PC\Documents\NP Project\DrawingClient\obj\Debug\net10.0-windows\refint\
 C:\Users\PC\Documents\NP Project\DrawingClient\obj\Debug\net10.0-windows\DrawingClient.pdb
 C:\Users\PC\Documents\NP Project\DrawingClient\obj\Debug\net10.0-windows\DrawingClient.genruntimeconfig.cache
 C:\Users\PC\Documents\NP Project\DrawingClient\obj\Debug\net10.0-windows\ref\DrawingClient.dll
+C:\Users\PC\Documents\NP Project\DrawingClient\obj\Debug\net10.0-windows\DrawingClient.sourcelink.json

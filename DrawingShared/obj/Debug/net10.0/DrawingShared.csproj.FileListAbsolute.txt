@@ -9,3 +9,4 @@ C:\Users\PC\Documents\NP Project\DrawingShared\obj\Debug\net10.0\DrawingShared.d
 C:\Users\PC\Documents\NP Project\DrawingShared\obj\Debug\net10.0\refint\DrawingShared.dll
 C:\Users\PC\Documents\NP Project\DrawingShared\obj\Debug\net10.0\DrawingShared.pdb
 C:\Users\PC\Documents\NP Project\DrawingShared\obj\Debug\net10.0\ref\DrawingShared.dll
+C:\Users\PC\Documents\NP Project\DrawingShared\obj\Debug\net10.0\DrawingShared.sourcelink.json
